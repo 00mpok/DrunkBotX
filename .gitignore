@@ -1,2 +1,22 @@
-/storage
+# PyCharm / JetBrains IDE
+.idea/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Logs
+logs/
+
+# Storage (runtime data)
+storage/
+
+# App config (contains secrets)
 /app/config.json
