@@ -11,6 +11,8 @@ services:
       - ./logs:/app/logs
     environment:
       - PYTHONUNBUFFERED=1
+      - BOT_TOKEN=""
+      - OPENAI_TOKEN=""
 
 networks:
   default:

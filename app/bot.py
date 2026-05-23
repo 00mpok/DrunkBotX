@@ -6,9 +6,18 @@
 
 import json
 import sys
-import interactions
 import logging
+import dotenv
+import os
 from pathlib import Path
+from interactions import (
+    Client,
+    Intents,
+    listen,
+)
+
+# Dev .env loading
+dotenv.load_dotenv()
 
 # Logging
 logging.basicConfig(
@@ -19,36 +28,47 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
-# SLASH COMMANDS _______________________________________________________________________________________________________
-def main():
-    try:
-        with open('config.json', 'r') as config_file:
-            config = json.load(config_file)
-    except FileNotFoundError:
-        logger.error("Configuration file missing. Please create a 'config.json' file in the root directory.")
-        sys.exit(1)
-    except json.decoder.JSONDecodeError:
-        logger.error("Config file 'config.json' is malformed, unable to parse JSON")
-        sys.exit(1)
 
-    # Create client
-    bot = interactions.Client(
-        token=config["BOT"]["TOKEN"],
-        intents=interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT,
-        send_command_tracebacks=False,
-        auto_defer=True,
-        logger=logger,
-    )
+# DRUNKBOTX ------------------------------------------------------------------------------------------------------------
+class DrunkBotX(Client):
+    def __init__(self, **kwargs) -> None:
+        token = os.getenv("BOT_TOKEN")
+        super().__init__(
+            token=token,
+            intents=Intents.DEFAULT | Intents.MESSAGE_CONTENT,
+            send_command_tracebacks = False,
+            auto_defer = True,
+            logger = log,
+            **kwargs
+        )
 
-    # Load ext
-    for fp in Path("ext").iterdir():
-        if fp.suffix == ".py":
-            bot.load_extension(f"ext.{fp.stem}", config=config)
+        self.config = None
+        self._load_extensions()
+        self.start()
 
-    # Fire
-    bot.start()
+    def _load_config(self):
+        try:
+            with open('config.json', 'r') as config_file:
+                self.config = json.load(config_file)
+        except FileNotFoundError:
+            log.error("Configuration file missing. Please create a 'config.json' file in the root directory.")
+            sys.exit(1)
+        except json.decoder.JSONDecodeError:
+            log.error("Config file 'config.json' is malformed, unable to parse JSON.")
+            sys.exit(1)
+
+    def _load_extensions(self):
+        for fp in Path("ext").iterdir():
+            if fp.suffix == ".py":
+                self.load_extension(f"ext.{fp.stem}", config=self.config)
+
+    @listen()
+    async def on_startup(self):
+        log.info("Initializing DrunkBotX")
+        log.info("-------------------")
+
 
 if __name__ == "__main__":
-    main()
+    DrunkBotX()
