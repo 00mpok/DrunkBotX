@@ -1,5 +1,5 @@
 # DrunkBotV2
- [![Tests](https://github.com/00mpok/DrunkBotV2/actions/workflows/test-app.yml/badge.svg)](https://github.com/00mpok/DrunkBotV2/actions/workflows/test-app.yml)
+
 ## Install
 ```bash
 git clone $directory; cd $directory
@@ -19,7 +19,6 @@ asterisk once the value has been filled in.
 {
   "BOT": {
     "TIMEZONE*": "America/Chicago",
-    "TOKEN*": "<bot_token>",
     "CHANNELS": {
       "GENERAL*": "<channel_id>"
     }
@@ -31,7 +30,6 @@ asterisk once the value has been filled in.
     }
   },
   "OPENAI": {
-    "TOKEN": "<openai_token>",
     "PROMPT": "Your name is Drunkbot. Respond by..."
   }
 }
