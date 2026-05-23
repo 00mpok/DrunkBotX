@@ -1,7 +1,7 @@
 import interactions
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # ======================================================================================================================
 # EXTENSION
@@ -15,7 +15,7 @@ class UserCommands(interactions.Extension):
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
     async def on_startup(self):
-        logger.info("UserCommands Extension Loaded.")
+        log.info("UserCommands Extension Loaded.")
 
     """ TASKS _______________________________________________________________________________________________________"""
 

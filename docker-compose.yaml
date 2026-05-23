@@ -11,8 +11,16 @@ services:
       - ./logs:/app/logs
     environment:
       - PYTHONUNBUFFERED=1
-      - BOT_TOKEN=""
-      - OPENAI_TOKEN=""
+      - BOT_TOKEN=${BOT_TOKEN}
+      - OPENAI_TOKEN=${OPENAI_TOKEN}
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    pids_limit: 50
 
 networks:
   default:

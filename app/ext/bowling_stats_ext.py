@@ -7,7 +7,7 @@ import dataclasses
 import pytz
 
 # Set logger
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # ======================================================================================================================
 # EXTENSION
@@ -17,31 +17,28 @@ class BowlingStats(interactions.Extension):
         super().__init__()
         self.bot = bot
         self.config = config
-        self.thursday_night_bowl_notification = True
         self.timezone = config.get("BOT", {}).get("TIMEZONE")
         self.general_channel = config.get("BOT", {}).get("CHANNELS", {}).get("GENERAL")
 
         if not self.timezone:
-            logger.warning("No TIMEZONE configured, preventing Thursday night bowl beers task")
-            self.thursday_night_bowl_notification = False
+            log.warning("No TIMEZONE configured, Thursday night bowl beers task will not be scheduled.")
         if not self.general_channel:
-            logger.warning("No CHANNELS.GENERAL configured, preventing Thursday night bowl beers task")
-            self.thursday_night_bowl_notification = False
+            log.warning("No CHANNELS.GENERAL configured, Thursday night bowl beers task will not be scheduled.")
 
         if os.path.exists("storage/bowling_stats.json"):
             with open("storage/bowling_stats.json", "r") as f:
                 stats = json.load(f)
-                logger.info(f"BowlingStats loaded for {', '.join(stats.keys())}")
+                log.info(f"BowlingStats loaded for {', '.join(stats.keys())}")
 
             self.bowlers = [BowlingStats.Bowler(k, v) for k, v in stats.items()]
-            self.week = max([week for bowler in self.bowlers for week in bowler.weeks_purchased]) + 1
-            logger.info(f"BowlingStats current week {self.week}")
+            self.week = (max([week for bowler in self.bowlers for week in bowler.weeks_purchased]) + 1) if self.bowlers else 1
+            log.info(f"BowlingStats current week {self.week}")
 
         else:
-            logger.info("No BowlingStats storage file detected, creating new file.")
+            log.info("No BowlingStats storage file detected, creating new file.")
             with open("storage/bowling_stats.json", "w") as f:
                 json.dump({}, f, indent=2)
-            logger.info("BowlingStats storage file created.")
+            log.info("BowlingStats storage file created.")
 
             self.bowlers = []
             self.week = 1
@@ -55,8 +52,13 @@ class BowlingStats(interactions.Extension):
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
     async def on_startup(self):
-        logger.info("BowlingStats Extension Loaded")
-        self.bowling_beers_task.start()
+        if not self.timezone or not self.general_channel:
+            log.warning("BowlingStats missing configs, unloading extension.")
+            self.bot.unload_extension(self.__module__)
+            return
+
+        log.info("BowlingStats Extension Loaded")
+        # self.bowling_beers_task.start() Disabled for the season
 
     @interactions.listen(interactions.api.events.Component)
     async def on_component(self, event: interactions.api.events.Component):
@@ -83,7 +85,7 @@ class BowlingStats(interactions.Extension):
                         bowler = BowlingStats.Bowler(name=name, weeks_purchased=[self.week])
                         self.bowlers.append(bowler)
 
-                        logger.info(f"New bowler {name} has been selected for beer round; week {self.week}.")
+                        log.info(f"New bowler {name} has been selected for beer round; week {self.week}.")
                         self.week += 1
 
                         base = build_bowler_beer_board(self.bowlers, bowler)
@@ -94,31 +96,32 @@ class BowlingStats(interactions.Extension):
                         for bowler in self.bowlers:
 
                             if bowler.name == event.ctx.values[0]:
-                                logger.info(f"{bowler.name} has been selected for beer round; week {self.week}.")
+                                log.info(f"{bowler.name} has been selected for beer round; week {self.week}.")
                                 bowler.weeks_purchased.append(self.week)
                                 self.week += 1
 
-                                base = build_bowler_beer_board(self.bowlers, bowler.name)
+                                base = build_bowler_beer_board(self.bowlers, bowler)
                                 await event.ctx.edit_origin(embed=base, components=[])
                                 break
 
                     with open("storage/bowling_stats.json", "w") as f:
                         data = {bowler.name: bowler.weeks_purchased for bowler in self.bowlers}
                         json.dump(data, f)
-                        logger.info(f"BowlingStats file updated. {data}")
+                        log.info(f"BowlingStats file updated.")
 
     """ TASKS _______________________________________________________________________________________________________"""
     @interactions.Task.create(interactions.IntervalTrigger(minutes=1))
     async def bowling_beers_task(self):
-        tz = pytz.timezone(self.timezone)
-        now = datetime.datetime.now(tz=tz)
-        general_channel = self.bot.get_channel(self.config["BOT"]["CHANNELS"]["GENERAL"])
+        if self.timezone and self.general_channel:
+            tz = pytz.timezone(self.timezone)
+            now = datetime.datetime.now(tz=tz)
+            general_channel = self.bot.get_channel(self.config["BOT"]["CHANNELS"]["GENERAL"])
 
-        if now.weekday() == 3 and now.hour == 20 and now.minute == 35 and self.thursday_night_bowl_notification:
-            await bowl_beers_selector_handler(
-                bowlers=self.bowlers,
-                inter=general_channel
-            )
+            if now.weekday() == 3 and now.hour == 20 and now.minute == 25:
+                await bowl_beers_selector_handler(
+                    bowlers=self.bowlers,
+                    inter=general_channel
+                )
 
     """ EXTENSION COMMANDS __________________________________________________________________________________________"""
     @interactions.slash_command(

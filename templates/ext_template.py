@@ -4,13 +4,13 @@ import logging
 import interactions
 
 # Set logger
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # ======================================================================================================================
 # EXTENSION
 # ======================================================================================================================
 class DiscordExtension(interactions.Extension):
-    def __init__(self, bot: interactions.Client) -> None:
+    def __init__(self, bot: interactions.Client, config: dict) -> None:
         super().__init__()
 
     """ LISTENERS ___________________________________________________________________________________________________"""

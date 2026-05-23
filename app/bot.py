@@ -30,11 +30,18 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+# Pathing
+_BASE = Path(__file__).parent
 
 # DRUNKBOTX ------------------------------------------------------------------------------------------------------------
 class DrunkBotX(Client):
     def __init__(self, **kwargs) -> None:
         token = os.getenv("BOT_TOKEN")
+
+        if not token:
+            log.error("BOT_TOKEN not found in environment variables.")
+            sys.exit(1)
+
         super().__init__(
             token=token,
             intents=Intents.DEFAULT | Intents.MESSAGE_CONTENT,
@@ -45,12 +52,13 @@ class DrunkBotX(Client):
         )
 
         self.config = None
+        self._load_config()
         self._load_extensions()
         self.start()
 
     def _load_config(self):
         try:
-            with open('config.json', 'r') as config_file:
+            with open(_BASE / "config.json", 'r') as config_file:
                 self.config = json.load(config_file)
         except FileNotFoundError:
             log.error("Configuration file missing. Please create a 'config.json' file in the root directory.")
@@ -60,7 +68,7 @@ class DrunkBotX(Client):
             sys.exit(1)
 
     def _load_extensions(self):
-        for fp in Path("ext").iterdir():
+        for fp in (_BASE / "ext").iterdir():
             if fp.suffix == ".py":
                 self.load_extension(f"ext.{fp.stem}", config=self.config)
 
