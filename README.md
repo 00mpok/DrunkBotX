@@ -5,6 +5,11 @@
 git clone $directory; cd $directory
  ```
 
+This project uses `uv` as for project management. Run `sync` to sync the project on your host.
+```bash
+uv sync
+```
+
 ## Configuration
 This bot requires a configuration file that must either be in the /src directory as config.json
 Here is a sample config.json file. Items marked with an asterisk are required. Remove the 
