@@ -1,4 +1,4 @@
-# My extension template for building up new Discord extensions
+# Extensions template
 
 import logging
 import interactions

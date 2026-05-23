@@ -8,12 +8,7 @@ import json
 import sys
 import interactions
 import logging
-import os
-
-# Build Required Directories
-for path in ["logs", "storage"]:
-    if not os.path.exists(path):
-        os.makedirs(path)
+from pathlib import Path
 
 # Logging
 logging.basicConfig(
@@ -32,7 +27,7 @@ def main():
         with open('config.json', 'r') as config_file:
             config = json.load(config_file)
     except FileNotFoundError:
-        logger.error("Config file 'config.json' not found")
+        logger.error("Configuration file missing. Please create a 'config.json' file in the root directory.")
         sys.exit(1)
     except json.decoder.JSONDecodeError:
         logger.error("Config file 'config.json' is malformed, unable to parse JSON")
@@ -48,9 +43,9 @@ def main():
     )
 
     # Load ext
-    for filename in os.listdir("ext"):
-        if filename.endswith(".py"):
-            bot.load_extension(f"ext.{filename[:-3]}", config=config)
+    for fp in Path("ext").iterdir():
+        if fp.suffix == ".py":
+            bot.load_extension(f"ext.{fp.stem}", config=config)
 
     # Fire
     bot.start()
