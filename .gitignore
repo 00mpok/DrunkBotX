@@ -6,6 +6,7 @@ venv/
 .venv/
 env/
 .env/
+*.env
 
 # Python cache
 __pycache__/
@@ -18,5 +19,5 @@ logs/
 # Storage (runtime data)
 storage/
 
-# App config (contains secrets)
-/app/config.json
+# App config
+*configs.json
