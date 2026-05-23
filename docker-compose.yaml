@@ -1,0 +1,18 @@
+---
+services:
+  drunkbot:
+    build: .
+    container_name: drunkbot
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ./config/config.json:/app/config.json:ro
+      - ./storage:/app/storage
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+
+networks:
+  default:
+    external: true
+    name: apps_net
