@@ -1,0 +1,11 @@
+[project]
+name = "drunkbotx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "discord-py-interactions>=5.16.0",
+    "openai>=2.38.0",
+    "pytz>=2026.2",
+]

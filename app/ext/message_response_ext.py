@@ -25,7 +25,7 @@ class MessageResponse(interactions.Extension):
             logger.warning("OPENAI configurations missing, preventing chatbot responses...")
             self.respond_chatbot = False
         else:
-            self.chatbot = openai.OpenAI(api_key=self.config["OPENAI"]["TOKEN"])
+            self.openai_client = openai.OpenAI(api_key=self.config["OPENAI"]["TOKEN"])
 
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
@@ -46,7 +46,7 @@ class MessageResponse(interactions.Extension):
         if "hey drunkbot" in content.lower() or "hey db" in content.lower():
             logger.info(f"Chatbot Request by {author}: {content}")
             prompt = self.config["OPENAI"]["PROMPT"] + content.lower()
-            response = self.chatbot.responses.create(
+            response = self.openai_client.responses.create(
                 model="gpt-4o-mini",
                 input=prompt
             )
