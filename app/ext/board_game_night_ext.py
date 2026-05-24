@@ -39,12 +39,12 @@ class BoardGames(interactions.Extension):
                 case "attending":
                     self.bgn.add_attendee(event.ctx.user.display_name, True)
                     emb, com = self.bgn.build_board()
-                    await event.ctx.edit_origin(embed=emb)
+                    await event.ctx.edit_origin(embed=emb, components=com)
 
                 case "declined":
                     self.bgn.add_attendee(event.ctx.user.display_name, False)
                     emb, com = self.bgn.build_board()
-                    await event.ctx.edit_origin(embed=emb)
+                    await event.ctx.edit_origin(embed=emb, components=com)
 
                 case _:
                     log.warning("Unhandled board game night component event custom id: %s", event)

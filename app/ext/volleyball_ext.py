@@ -1,8 +1,6 @@
 # Extensions template
 
 import logging
-from difflib import Match
-
 import interactions
 import json
 import pytz
@@ -67,16 +65,17 @@ class Volleyball(interactions.Extension):
         tz = pytz.timezone(self.timezone)
         now = datetime.now(tz=tz)
 
-        if now.hour == 9 and now.minute == 0:
-            general_channel = self.bot.get_channel(self.general_channel)
+        if now.hour != 9 or now.minute != 0:
+            return
 
-            for match in self.matches:
-                if now.date() == match.dt.date():
-                    await general_channel.send(
-                        embed=match_embed(match),
-                    )
-                    log.info(f"Match notification sent for {match.dt.strftime('%Y-%m-%d %H:%M')}.")
-                    self.matches.remove(match)
+        general_channel = self.bot.get_channel(self.general_channel)
+        for match in list(self.matches):
+            if now.date() == match.dt.date():
+                await general_channel.send(
+                    embed=match_embed(match),
+                )
+                log.info(f"Match notification sent for {match.dt.strftime('%Y-%m-%d %H:%M')}.")
+                self.matches.remove(match)
 
 
     """ EXTENSION COMMANDS __________________________________________________________________________________________"""
@@ -91,7 +90,7 @@ def match_embed(match: Volleyball.Match) -> interactions.Embed:
         color=interactions.Color.random(),
     )
     base.add_field(
-        name=f"Match Details",
+        name=f"Match Details 🏐",
         value=f"```Time: {match.dt.strftime('%H:%M')}\n"
               f"Court: {match.court}```"
     )
