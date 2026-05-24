@@ -129,6 +129,11 @@ class BowlingStats(interactions.Extension):
         description="Tracks the counts of the bowler who has to pay on second round"
     )
     async def bowl_beers(self, inter: interactions.SlashContext):
+        if not self.timezone or not self.general_channel:
+            log.warning(f"BowlingStats slash command called after extension unloaded. "
+                        f"Check configurations for required data.")
+            return
+
         await bowl_beers_selector_handler(
             bowlers=self.bowlers,
             inter=inter
