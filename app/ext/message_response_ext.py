@@ -46,7 +46,7 @@ class MessageResponse(interactions.Extension):
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
     async def on_startup(self):
-        log.info("MessageResponse Extension Loaded.")
+        log.info("MessageResponse Extension Ready.")
 
     @interactions.listen()
     @_block_bot_content

@@ -15,7 +15,7 @@ class UserCommands(interactions.Extension):
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
     async def on_startup(self):
-        log.info("UserCommands Extension Loaded.")
+        log.info("UserCommands Extension Ready.")
 
     """ TASKS _______________________________________________________________________________________________________"""
 
