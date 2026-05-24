@@ -21,4 +21,4 @@ USER drunkbot
 COPY app/ /app/
 
 # Command to run the bot
-CMD ["uv", "run", "python3", "bot.py"]
+CMD ["/app/.venv/bin/python3", "bot.py"]
