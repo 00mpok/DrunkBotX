@@ -1,4 +1,4 @@
-# DrunkBotV2
+# DrunkBotX
 
 ## Install
 ```bash
