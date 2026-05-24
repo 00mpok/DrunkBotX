@@ -28,7 +28,7 @@ class BoardGames(interactions.Extension):
     """ LISTENERS ___________________________________________________________________________________________________"""
     @interactions.listen()
     async def on_startup(self):
-        log.info("BoardGameNight Extension Loaded.")
+        log.info("BoardGameNight Extension Ready.")
         # self.board_game_night_task.start() Disabled for the season
 
     @interactions.listen(interactions.api.events.Component)

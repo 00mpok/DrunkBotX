@@ -57,7 +57,7 @@ class BowlingStats(interactions.Extension):
             self.bot.unload_extension(self.__module__)
             return
 
-        log.info("BowlingStats Extension Loaded")
+        log.info("BowlingStats Extension Ready")
         # self.bowling_beers_task.start() Disabled for the season
 
     @interactions.listen(interactions.api.events.Component)
