@@ -1,32 +1,49 @@
 # DrunkBotX
 
-## Install
-```bash
-git clone $directory; cd $directory
- ```
+A Discord bot built for a friend group. It responds to chat messages with AI, handles RSVP boards for board game nights, tracks bowling beer-buying duty, and sends match-day reminders for volleyball.
 
-This project uses `uv` as for project management. Run `sync` to sync the project on your host.
+## Features
+
+| Extension | What it does |
+|---|---|
+| `message_response` | AI chat via OpenAI (`hey drunkbot` / `hey db`), random emoji reactions, nickname substitutions |
+| `board_game_night` | Interactive RSVP board with Attend/Decline buttons; auto-posts every 2 weeks |
+| `bowling_stats` | `/bowl_beers` — tracks which bowler owes the second-round beers each Thursday night |
+| `volleyball` | Sends a match-day notification at 9 AM for scheduled volleyball games |
+| `user_commands` | `/who` — pings a user with a file vault link |
+
+## Prerequisites
+
+- Python 3.13+
+- [uv](https://github.com/astral-sh/uv) (package manager)
+- Docker + Docker Compose (for container deployment)
+- A Discord bot token with the required permissions (see below)
+- An OpenAI API key (optional — only needed for AI chat responses)
+
+## Setup
+
+**1. Clone and install dependencies**
+
 ```bash
+git clone <repo-url>
+cd DrunkBotX
 uv sync
 ```
 
-## Configuration
-This bot requires a configuration file that must either be in the /src directory as config.json
-Here is a sample config.json file. Items marked with an asterisk are required. Remove the 
-asterisk once the value has been filled in.
+**2. Create `app/config.json`**
 
 ```json
 {
   "BOT": {
-    "TIMEZONE*": "America/Chicago",
+    "TIMEZONE": "America/Chicago",
     "CHANNELS": {
-      "GENERAL*": "<channel_id>"
+      "GENERAL": "<channel_id>"
     }
   },
   "MESSAGES": {
     "NICKNAMES": {
-      "TOMMY": ["Nickname"],
-      "LINDA": ["Nickname"]
+      "TOMMY": ["Big Tom", "The Tominator"],
+      "LINDA": ["Lin-dawg"]
     }
   },
   "OPENAI": {
@@ -35,33 +52,76 @@ asterisk once the value has been filled in.
 }
 ```
 
- ## Bot Permissions
-General Permissions:
- * applications.commands
- * bot
+`BOT.TIMEZONE` and `BOT.CHANNELS.GENERAL` are required. Extensions that depend on them will unload at startup if they are missing. `MESSAGES.NICKNAMES` and `OPENAI.PROMPT` are optional.
 
- board_game_night extension:
-  * Send Messages
-  * Manage Messages
+**3. Set environment variables**
 
- message_response extension:
-  * Send Messages
-  * Manage Messages
+Create a `.env` file in the project root (used locally via `python-dotenv`):
 
-## Docker Compose File
-Here is a sample docker-compose.yaml file.
-```yaml
----
-services:
-  drunkbot:
-    build: .
-    container_name: drunkbot
-    restart: always
+```env
+BOT_TOKEN=your_discord_bot_token
+OPENAI_TOKEN=your_openai_api_key
 ```
 
-## Build and Run Container
-Build and start the container by executing the following command:
+**4. Create storage and log directories**
+
+```bash
+mkdir storage logs
+```
+
+The `bowling_stats` extension reads and writes `storage/bowling_stats.json`. The `volleyball` extension reads `storage/volleyball_matches.json` (see format below).
+
+## Running Locally
+
+```bash
+uv run python app/bot.py
+```
+
+## Docker Deployment
+
+The `docker-compose.yaml` expects:
+
+- `./config/config.json` — mounted read-only into the container
+- `./storage/` — persistent JSON storage
+- `./logs/` — persistent log output
+- `BOT_TOKEN` and `OPENAI_TOKEN` set in the environment or a `.env` file
+
+Build and start:
+
 ```bash
 docker compose up -d
 ```
 
+## Discord Bot Permissions
+
+**General:**
+- `applications.commands`
+- `bot`
+
+**Required for `board_game_night` and `message_response`:**
+- Send Messages
+- Manage Messages
+
+**Required intents:** `DEFAULT` + `MESSAGE_CONTENT`
+
+## Storage File Formats
+
+**`storage/bowling_stats.json`** — auto-managed by the bot:
+```json
+{
+  "Tommy": [1, 3, 7],
+  "Linda": [2, 4, 5, 6]
+}
+```
+
+**`storage/volleyball_matches.json`** — manually maintained:
+```json
+{
+  "2025-06-05 19:30:00": { "court": 3, "team": "The Spikers" },
+  "2025-06-12 19:30:00": { "court": 1, "team": "Net Gains" }
+}
+```
+
+## Adding Extensions
+
+Use `templates/ext_template.py` as a starting point. Drop the new file into `app/ext/` and it will be loaded automatically on next startup.
