@@ -462,16 +462,16 @@ async def searchtime(interaction: discord.Interaction, time_query: str):
 # BOT READY
 # -----------------------------
 
-@bot.event
-async def on_ready():
-    guild = discord.Object(id=705812118657695764)
-    # print(guild)
-    try:
-        await tree.sync()
-        #guild=guild
-        print("Commands synced")
-    except Exception as e:
-        print("Sync error:", e)
+# @bot.event
+# async def on_ready():
+#     guild = discord.Object(id=705812118657695764)
+#     # print(guild)
+#     try:
+#         await tree.sync()
+#         #guild=guild
+#         print("Commands synced")
+#     except Exception as e:
+#         print("Sync error:", e)
     
     # # DELETE all existing guild commands
     # tree.clear_commands(guild=guild)
@@ -483,6 +483,6 @@ async def on_ready():
 # RUN BOT
 # -----------------------------
 
-load_dotenv()
-token = os.getenv("DISCORD_TOKEN")
-bot.run(token)
+# load_dotenv()
+# token = os.getenv("DISCORD_TOKEN")
+# bot.run(token)

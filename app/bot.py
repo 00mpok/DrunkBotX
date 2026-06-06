@@ -36,10 +36,10 @@ _BASE = Path(__file__).parent
 # DRUNKBOTX ------------------------------------------------------------------------------------------------------------
 class DrunkBotX(Client):
     def __init__(self, **kwargs) -> None:
-        token = os.getenv("BOT_TOKEN")
+        token = os.getenv("DISCORD_TOKEN")
 
         if not token:
-            log.error("BOT_TOKEN not found in environment variables.")
+            log.error("DISCORD_TOKEN not found in environment variables.")
             sys.exit(1)
 
         super().__init__(
